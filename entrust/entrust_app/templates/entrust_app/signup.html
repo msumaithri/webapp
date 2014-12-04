@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> Entrust - Home Page </title>
+		<meta charset="utf-8">
+		<meta name="author" content="Z-Warriors">
+		<link rel="shortcut icon" href="/static/ico/favicon.ico">
+	    <link href="/static/css/bootstrap.css" rel="stylesheet">
+	    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+	    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+	    <link href="/static/css/style.css" rel="stylesheet">
+		<link href="http://fonts.googleapis.com/css?family=Syncopate" rel="stylesheet" type="text/css">
+
+<!-- TO DISPLAY THE MAPS -->
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+ var geocoder, map, marker;
+ var LatLng = new google.maps.LatLng(30,0);
+  function initialize() {
+    geocoder = new google.maps.Geocoder();
+    var mapOptions = {
+      zoom: 12,
+      center: LatLng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    map = new google.maps.Map(
+      document.getElementById("map-canvas"),
+      mapOptions
+    );
+    marker = new google.maps.Marker();
+}
+</script>
+</head>
+<body onload="initialize()">
+<div class="container-fluid">
+	<div class="span4">
+	</div>
+	<a href="/entrust-app/" > <img alt="170x170" align="center" class="span4" src="/static/img/logo.png"/> </a>
+	<div class="span4">
+	</div>
+
+	<div class="span12">
+	<div class="span4">
+	</div>
+	<h4 class="span6">Welcome to Entrust! Sign up for free now</h4>
+	<div class="span12">
+	</div>
+	<div class="span5">
+	</div>
+	<div class="span4">
+		<form name="register" action='/entrust-app/signup' method='POST' id="register">
+		{% csrf_token %}  
+			<fieldset>  
+				<table>  
+				{% for field in form %}
+				<tr>
+				<td>
+				   
+				{{field}}
+				
+				</td>
+				<td style="color:red">{{field.errors}} </td>
+				</tr>
+				{% endfor %}
+				</table>
+				<div class="control-group" style="margin-top:5px;margin-left:55px"> 
+		            <input type="button" value="Register" class="btn btn-inverse" style="margin-top:5px" onclick="validate()"></input>  
+		        </div>  
+			</fieldset>  
+		</form>
+		<h4>{{form.non_field_errors}}</h4>
+		<h4>{{registration_message}}</h4>
+		<ul id="jserror" style="margin-left:-100px">
+				
+		</ul>
+	</div> 
+	</div>
+		<div class="span3">
+	</div>
+	</div>
+
+</div>
+<div id="map-canvas"></div>
+
+
+<!-- VALIDATES USER ADDRESS AND SENDS THE REQUEST -->
+<script type="text/javascript">
+   function validate() {
+    clearResults();
+	
+  var door = document.getElementById('id_doorno').value;
+  var street = document.getElementById('id_street').value;
+  var city = document.getElementById('id_city').value;
+  var state = document.getElementById('id_state').value;
+  var pin = document.getElementById('id_pincode').value;
+  var country = "United States";
+
+  if ( door == "" || street =="" || city == "" || state == "" || pin == "")
+  {
+     addelement();
+  }
+
+  var address = country + "," + state + "," + city + ","+ street + "," + door;
+
+  geocoder.geocode({'address': address }, function(results, status) {
+  switch(status) {
+      case google.maps.GeocoderStatus.OK:
+	  if ( results[0].types[0] != "street_address")
+	  {
+	  	addelement();
+		break;
+          }
+	  sendRequest();
+          break;
+        case google.maps.GeocoderStatus.ZERO_RESULTS:
+	addelement();
+          break;
+        default:
+          alert("An error occured while validating this address");
+      }
+    });
+	
+  }
+ function clearResults() {
+    var list = document.getElementById("jserror");
+        while (list.firstChild) {
+                list.removeChild(list.firstChild);
+                }
+ }
+ function addelement() {
+  	var ullist = document.getElementById("jserror");
+	ullist.innerHTML="<li style= \"color:red; font-size:17px\">WE COULD NOT FIND YOU. ENTER A VALID ADDRESS</li>";
+   
+ }
+function sendRequest() {
+
+	document.getElementById("register").submit();	
+
+}
+</script>
+<!-- ADDRESS VALIDATION AND REQUEST SENDING ENDS HERE -->
+</body>
+</html>

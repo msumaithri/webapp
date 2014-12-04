@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> Entrust - Task Status </title>
+		<meta charset="utf-8">
+		<meta name="author" content="Z-Warriors">
+
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Syncopate" rel="stylesheet" type="text/css">	
+	<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/footer.css" rel="stylesheet">
+  
+  <link rel="shortcut icon" href="img/favicon.png">
+ 
+	<script type="text/javascript" src="/static/js/scripts.js"></script>
+
+</head>
+<body>
+<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?v=3&sensor=false"></script>
+<script type="text/javascript">
+ var geocoder;
+  var map;
+  function initialize() {
+    geocoder = new google.maps.Geocoder();
+    var latlng = new google.maps.LatLng(40.438332,-79.997459);
+    var mapOptions = {
+      zoom: 15,
+      center: latlng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
+	var marker = new google.maps.Marker();
+  }
+</script>
+
+<div class="container-fluid">
+<div class="row-fluid">
+		<div class="span2">
+			<a href="/entrust-app/"> <img alt="140x140" src="/static/img/logo.png"/> </a>
+		</div>
+	<div class="span8" style="padding-left:50px">
+	<div class="navbar">
+                <div class="navbar-inner">
+                        <ul class="nav navbar-nav">
+                              
+                                <li style="padding-left:50px"><a href="/entrust-app/home/?id=1"><i class="icon-home icon-white"></i>Home</a></li>
+                                <li><a href="/entrust-app/viewtasks"><i class="icon-th icon-white"></i>Your Tasks</a></li>
+                                <li class="divider"></li>  
+                                <li><a href="/entrust-app/accept_list"><i class="icon-th icon-white"></i>Task Accepted</a></li>
+                                <li><a href="/entrust-app/post-task">Post task</a></li> 
+                                <li class="divider"></li>  
+                                <li class="dropdown">  
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user icon-white"></i>{{ user_info.first_name }}<b class="caret"></b></a>  
+                                <ul class="dropdown-menu">  
+                                    <li><a href="{% url 'display_profile' user_info.username %}" target="pagebody">View Profile</a></li>  
+                                    <li><a href="/entrust-app/change" target="pagebody">Edit Profile</a></li>  
+                                    <li><a href="https://www.youtube.com/embed/2UZqkqCRiY8">Help</a></li> 
+                                    <li class="divider"></li> 
+                                    <li><a href="/entrust-app/logout">Logout</a></li>  
+                                </ul>
+                                <li><a href="{% url 'task_refresh' %}"><i class="icon-refresh icon-white"></i></a></li>
+                        </ul>  
+                </div>
+        </div>  
+	</div>
+</div>
+
+<hr>
+	<div class="row-fluid">
+		<div class="span6">
+
+			<h3 style="font-family:verdana;"> {{ task_info.user_ordering.first_name }} </h3>
+			<p> Address: {{ address }} 	</p>
+			<br>
+			<h4 style="font-family:verdana;"> {{ task_info.task_name }}	</h4>
+			<p> {{ task_info.task_details }} </p>
+			<br>
+			<p style="font-family:verdana;"><small> Posted on {{ task_info.task_post_date }}</small> </p>
+		</div>
+		<div class="span6">
+			<div class="btn-group">
+
+				{% if task_info.user_ordering.username != user_info.username %}
+				
+				{% if already_accepted == 1 %}
+				<a href="#" class="btn btn-success btn-small disabled span12"><i class="icon-white icon-ok"></i>Accepted</a>
+				<br>
+				<a href="{% url 'task_discussion' discussion_id %}" class="btn btn-info btn-small active span12"><i class="icon-white icon-flag"></i>Discuss</a>
+
+				{% endif %}
+				{% if task_info.task_status == "open" %}
+				{% if already_accepted == 0 %}
+				<a href="{% url 'task_queue' task_info.id %}" class="btn btn-success btn-small span12"><i class="icon-white icon-ok"></i>Accept</a> 
+				{% endif %}
+				{% endif %}
+
+				{% if task_info.task_status == "approved" %}
+				{% if already_accepted == 0 %}
+				<a href="#" class="btn btn-inverse disabled span12">Task already taken</a> 
+				{% endif %}
+				{% endif %}
+
+				{% endif %}
+
+
+
+				{% if task_info.user_ordering.username == user_info.username %}
+				<a href="{% url 'show_queue' task_info.id %}" class="btn btn-success btn-small span12"><i class="icon-white icon-ok"></i>Show Queue</a> 
+				{% endif %}
+			</div>
+			<h3>
+				The following is the status of task
+			</h3>
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>
+							Deadline
+						</td>
+						<td>
+							{{ task_info.deadline }}
+						</td>
+					</tr>
+					<tr class="error">
+						<td>
+							People in queue
+						</td>
+						<td>
+							{{ people_in_queue }}
+						</td>
+
+					</tr>
+					<tr>
+						<td>
+							Status
+						</td>
+						<td>
+							{{ task_info.task_status }}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<!-- FUNCTION TO DISPLAY THE MAP -->
+			<div id="map-canvas" style="width: 500px; height: 320px;"></div>
+  			<div>
+    			<input id="address" type="hidden" value="{{address}}">
+  			</div>
+			<script>
+			initialize();
+			</script>
+			</div>
+			<!-- FUNCTION TO DISPLAY THE MAP -->
+		</div>
+	</div>
+</div>
+<hr>
+	<div class="row-fluid">
+		<div class="span6">
+			<ul>
+				<li>
+					<a href="#">Entrust in media</a>
+				</li>
+				<li>
+					<a href="#">About us</a>
+				</li>
+				<li>
+					<a href="#">Careers</a>
+				</li>
+			</ul>
+		</div>
+		<div class="span6">
+			 <address> <strong>Entrust, Inc.</strong><br /> 5000 forbes Ave,<br /> Pittsburgh, PA 15213<br /> <abbr title="Phone">P:</abbr> (123) 456-7890</address>
+		</div>
+	</div>
+</div>
+    <link href="/static/css/footer.css" rel="stylesheet">
+    <div id="footer" class="row_bottom span12">
+      <div class="container-fluid">
+        <p class="text-muted credit pull-center" style="padding-top:25px">Courtesy <a href="#">Sumaithri Mukkamalla & Arvind Balaji</a> as a part of Web Application Development <a href="http://www.cs.cmu.edu/~charlie/courses/webapps/2012-fall/"> (15-637) </a> course at <a href="http://www.cmu.edu"> CMU </a><a href="/entrust-app/resources">|| Resources ||</a></p>
+      </div>
+    </div>
+
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/scripts.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.js"></script>  
+    <script type="text/javascript" src="/static/js/bootstrap-dropdown.js"></script>  
+
+	<script type="text/javascript">  
+	$(document).ready(function () {  
+	    $('.dropdown-toggle').dropdown();  
+	});  
+	</script>
+<script>
+  function codeAddress() {
+  //  var geocoder = new google.maps.Geocoder();
+    var address = document.getElementById("address").value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  }
+</script>
+<script type="text/javascript"> 
+codeAddress();
+</script>
+</body>
+</html>

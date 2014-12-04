@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="/static/ico/favicon.ico">
+
+    <title>Entrust - View Profile</title>
+
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Syncopate" rel="stylesheet" type="text/css">	
+	<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="/static/css/style.css" rel="stylesheet">
+
+  </head>
+
+<body>
+
+<div class="container-fluid">
+<div class="row-fluid">
+		<div class="span2">
+			<a href="/entrust-app/"> <img alt="140x140" src="/static/img/logo.png"/> </a>
+		</div>
+	<div class="span8" style="padding-left:50px">
+	<div class="navbar">
+                <div class="navbar-inner">
+                        <ul class="nav navbar-nav">
+                                <li style="padding-left:50px"><a href="/entrust-app/home/?id=1"><i class="icon-home icon-white"></i>Home</a></li>
+                                <li><a href="/entrust-app/viewtasks"><i class="icon-th icon-white"></i>Your Tasks</a></li>
+                                <li class="divider"></li>  
+                                <li><a href="/entrust-app/accept_list"><i class="icon-th icon-white"></i>Task Accepted</a></li>
+                                <li><a href="/entrust-app/post-task">Post task</a></li> 
+                                <li class="divider"></li>  
+                                <li class="dropdown">  
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user icon-white"></i>{{ first_name }}<b class="caret"></b></a>  
+                                <ul class="dropdown-menu">  
+                                    <li><a href="{% url 'display_profile' username %}" target="pagebody">View Profile</a></li>  
+                                    <li><a href="/entrust-app/change" target="pagebody">Edit Profile</a></li>  
+                                    <li><a href="https://www.youtube.com/embed/2UZqkqCRiY8">Help</a></li> 
+                                    <li class="divider"></li> 
+                                    <li><a href="/entrust-app/logout">Logout</a></li>  
+                                </ul>
+                                <li><a href="{% url 'task_refresh' %}"><i class="icon-refresh icon-white"></i></a></li>
+                        </ul>  
+                </div>
+        </div>  
+	</div>
+</div>
+
+
+
+	{% for error in errors %}
+		<p style="color:red">
+			{{ error }}
+		</p>
+	{% endfor %}
+		<legend>Your entrust account information</legend>
+			<div class="span6">	
+				<h3 class="syncopate_font"> {{ full_name }} </h3>
+			</div>
+			<div class="span6">
+				<img src="{% url 'profile_pic' user_info.user.username %}"/ >
+			</div>
+			<br>
+			<div class="span6">
+			<h4>Click <b><i><u><a href="{% url 'view_testimonials' user_info.user.username %}"><font color="black">here</font></a></u></i></b> to view {{full_name}}'s testimonials</h4>
+			<form class="profile" method="post" action="" accept-charset="UTF-8">
+				<fieldset>
+					  <div>
+					    <label class="span2"> First Name</label>
+					    <div class="input">
+					      <span class="uneditable-input span4" style="height:30px;width:300px;" >{{ user_info.user.first_name }}</span>
+					    </div>
+					  <div>
+					   <label class="span2"> Last Name</label>
+					    <div class="input">
+					      <span class="uneditable-input span4"  style="height:30px;width:300px;" >{{ user_info.user.last_name }}</span>
+					    </div>
+					  </div>
+					  <label class="span2"> Date of Birth* </label>
+					  <div class="input">
+					      <span class="uneditable-input span5"  style="height:30px;width:300px;" >{{ user_info.dob }}</span>
+					  </div>
+					  <div class="span8">
+					    <label>Address</label>
+						<hr>
+					      <span class="uneditable-input span2"  style="height:30px;width:150px;" >{{ user_info.door_number }}</span>
+					      <span class="uneditable-input span2" style="height:30px;width:150px;"  >{{ user_info.street }}</span>
+					      <span class="uneditable-input span2" style="height:30px;width:150px;" >{{ user_info.city }}</span>
+					      <span class="uneditable-input span2" style="height:30px;width:150px;" >{{ user_info.pincode }}</span>
+					  <div>
+					  <label>Phone number</label>
+					    <div class="input">
+					      <span class="uneditable-input span6" style="height:30px;width:150px;" >{{ user_info.phone_number }}</span>
+					    <label>Email address</label>
+					    <div class="input">
+					      <span class="uneditable-input span6" style="height:30px;width:300px;" >{{ user_info.user.email }}</span>
+					    </div>
+					  </div>
+					  <div>
+					    <label>Country</label>
+					    <div class="input">
+					      <span class="uneditable-input span6" style="height:30px;width:300px;" > {{ user_info.country }}</span>
+					    </div>
+					  </div>
+					  <br>
+					  {% if username == user_info.user.username %}
+					 <a class="btn btn-primary btn-small active" href="/entrust-app/change"> <i class="icon-white icon-edit"></i>Edit Profile</a>
+					 <a href="/entrust-app/accounts/password_change/" class="btn btn-primary btn-small active"><i class="icon-white icon-off"></i> Change Password</a>
+					 {% endif %}
+				</fieldset>
+				<hr>
+				<input type="hidden" name="next" value="{{ next }}" />
+				{% csrf_token %}
+			</form>
+			</div>
+
+    <link href="/static/css/footer.css" rel="stylesheet">
+    <div id="footer" class="row_bottom span12">
+      <div class="container-fluid">
+        <p class="text-muted credit pull-center" style="padding-top:25px">Courtesy <a href="#">Sumaithri Mukkamalla & Arvind Balaji</a> as a part of Web Application Development <a href="http://www.cs.cmu.edu/~charlie/courses/webapps/2012-fall/"> (15-637) </a> course at <a href="http://www.cmu.edu"> CMU </a><a href="/entrust-app/resources">|| Resources ||</a></p>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="/static/js/jquery.js"></script>  
+    <script type="text/javascript" src="/static/js/bootstrap-dropdown.js"></script>  
+
+	<script src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript">  
+	$(document).ready(function () {  
+	    $('.dropdown-toggle').dropdown();  
+	});  
+	</script>  
+
+</body>
+</html>

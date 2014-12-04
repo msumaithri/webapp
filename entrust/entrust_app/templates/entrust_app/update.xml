@@ -1,0 +1,10 @@
+<dynamic>
+{% for values in tasks_name %}
+<tasks>
+    <taskname>{{ values.task_name}}</taskname>
+    <taskdetails>{{values.task_details}}</taskdetails>
+    <id>{{values.id}}</id>
+    <uname>{{values.user_ordering.username}}</uname>
+</tasks>
+{% endfor %}
+</dynamic>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> Entrust - Entrust your task </title>
+		<meta charset="utf-8">
+		<meta name="author" content="Z-Warriors">
+
+
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Syncopate" rel="stylesheet" type="text/css">	
+	<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link href="/static/css/style.css" rel="stylesheet">
+    <link href="/static/css/footer.css" rel="stylesheet">
+  
+  <link rel="shortcut icon" href="img/favicon.png">
+<!-- TO DISPLAY THE MAPS -->
+
+<!-- END FUNCTION -->
+</head>
+
+<body>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script>
+ var geocoder; 
+ var map; 
+  function initialize() {
+    geocoder = new google.maps.Geocoder();
+    var LatLng = new google.maps.LatLng(40.438332,-79.997459);
+    var mapOptions = {
+      zoom: 14,
+      center: LatLng,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    map = new google.maps.Map(
+      document.getElementById("map-canvas"),
+      mapOptions
+    );
+ var marker = new google.maps.Marker();
+}
+</script>
+
+
+<div class="container-fluid">
+<div class="row-fluid">
+		<div class="span2">
+			<a href="/entrust-app/"> <img alt="140x140" src="/static/img/logo.png"/> </a>
+		</div>
+	<div class="span8" style="padding-left:50px">
+	<div class="navbar">
+                <div class="navbar-inner">
+                        <ul class="nav navbar-nav">
+                                <li style="padding-left:50px"><a href="/entrust-app/home/?id=1"><i class="icon-home icon-white"></i>Home</a></li>
+                                <li><a href="/entrust-app/viewtasks"><i class="icon-th icon-white"></i>Your Tasks</a></li>
+                                <li class="divider"></li>  
+                                <li><a href="/entrust-app/accept_list"><i class="icon-th icon-white"></i>Task Accepted</a></li>
+                                <li><a href="/entrust-app/post-task">Post task</a></li> 
+                                <li class="divider"></li>  
+                                <li class="dropdown">  
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-user icon-white"></i>{{ first_name }} <b class="caret"></b></a>  
+                                <ul class="dropdown-menu">  
+                                    <li><a href="{% url 'display_profile' username %}" target="pagebody">View Profile</a></li>  
+                                    <li><a href="/entrust-app/change" target="pagebody">Edit Profile</a></li>  
+                                    <li><a href="https://www.youtube.com/embed/2UZqkqCRiY8">Help</a></li> 
+                                    <li class="divider"></li> 
+                                    <li><a href="/entrust-app/logout">Logout</a></li> 
+                                </ul>
+                                <li><a href="{% url 'task_refresh' %}"><i class="icon-refresh icon-white"></i></a></li>
+                        </ul>  
+                </div>
+        </div>  
+	</div>
+</div>
+
+	<div class="row-fluid">
+		<div class="span6">
+			
+				<fieldset>
+				<form name="task" name="post-task" id="post-task" method="POST" action="/entrust-app/post-task/">
+				{% csrf_token %}
+					<legend>What do you need today?</legend>
+					<span class="help-block"></span>
+					<label style="margin-left:110px">Entrust your task here</label>
+					<input type="text" name="name" id="name" placeholder="Name your task" style="margin-left:110px;width:420px; height:30px"/>
+					<label style="margin-left:110px;"> Type of task </label>					
+					<select name="tasktype" id="tasktype" style="margin-left:110px;width:420px;height:30px">
+					  <option value="inter">Inter city</option>
+					  <option value="intra">Intra city</option>
+					  <option value="neighbour">Neighbourhood</option>
+					</select>
+					<label style="margin-left:110px"> Destination address </label>
+					<input type="text" name="door" id="door" placeholder="Door Number" style="margin-left:110px;height:30px"/>
+					<input type="text" name="street" id="street" placeholder="Street" style="height:30px;"/>
+					<input type="text" name="city" id="city" placeholder="City" style="margin-left:110px;height:30px"/>
+					<input type="text" name="state" id="state" placeholder="State" style="height:30px"/>
+					<input type="text" name="pin" id="pin" placeholder="Pincode" style="margin-left:210px;height:30px"/>
+					<label style="margin-left:110px"> Deadline for the task </label>
+					<input type="date" name="deadline" id="deadline" placeholder="Deadline" style="margin-left:110px;width:420px;height:30px"/>
+					<label style="margin-left:110px"> Amount payable </label>
+					<input type="text" name="value" id="value" placeholder="Amount in $" style="margin-left:110px;width:420px;height:30px"/>
+					<label style="margin-left:110px"> Description of task </label>
+					<input type="text" name="description" id="description" placeholder="Write here" style="margin-left:110px;width:420px;height:50px"/>
+					<br>
+					<input type="button" class="info" value="Post it!" style="margin-left:280px" onclick="validate()">
+				</form>
+				<ul id="jserror">
+				
+				</ul>
+				</fieldset>
+			
+		</div>
+			</ul>
+<!-- FUNCTION FOR DISPLAYING THE MAP -->
+		<div id="map-canvas" style="width: 550px; height: 550px;"></div>
+  			<div>
+    			<input id="address" type="hidden" value="{{address}}">
+  			</div>
+			
+		</div>
+<!-- ENDS HERE -->
+		<script>
+		initialize();
+		</script>
+	</div>
+		
+	<div class="row-fluid">
+		<div class="span12" id="prevtasks">
+			<h3>
+				Your previous tasks
+				
+			</h3>
+			{% for values in tasks_name %}  
+			<div class="media">
+				<div class="media span6" style="border:1px solid black">
+				 <a href="#" class="pull-left"><img src="{% url 'profile_pic' username %}" class="media-object" alt='' height="90px" width="90px"/></a>
+					<h4 class="media-heading">
+						 {{ values.task_name }}
+					</h4> {{ values.task_details }}<br> 
+					<p class="pull-right">  {{ values.task_post_date }} </p>
+				</div>
+			</div>
+			{% endfor %}
+			
+		</div>
+	</div>
+<hr>
+	<div class="row-fluid">
+		<div class="span6">
+			<ul>
+				<li>
+					<a href="#">Entrust in media</a>
+				</li>
+				<li>
+					<a href="#">About us</a>
+				</li>
+				<li>
+					<a href="#">Careers</a>
+				</li>
+			</ul>
+	
+		</div>
+		<div class="span6">
+			 <address> <strong>Entrust, Inc.</strong><br /> 5000 forbes Ave,<br /> Pittsburgh, PA 15213<br /> <abbr title="Phone">P:</abbr> (123) 456-7890</address>
+		</div>
+	</div>
+</div>	
+ <div id="map_canvas"></div>
+
+
+<!-- VALIDATES USER ADDRESS AND SENDS THE REQUEST -->
+
+
+
+<script type="text/javascript" src="/static/js/date.js"></script>
+<script type="text/javascript">
+   function validate() {
+    clearResults();
+	
+  var door = document.getElementById('door').value;
+  var street = document.getElementById('street').value;
+  var city = document.getElementById('city').value;
+  var state = document.getElementById('state').value;
+  var pin = document.getElementById('pin').value;
+  var country = "United States";
+  	
+  if ( door == "" || street =="" || city == "" || state == "" || pin == "")
+  {
+     addelement();
+  }
+
+  var address = country + "," + state + "," + city + ","+ street + "," + door;
+  var date1 = document.getElementById('deadline').value;
+  var today = Date.today();
+
+  geocoder.geocode({'address': address }, function(results, status) {
+  switch(status) {
+      case google.maps.GeocoderStatus.OK:
+//document.getElementById('valid').value = 'YES';
+	  if ( results[0].types[0] != "street_address")
+	  {
+//document.getElementById('type').value = "Blast you";
+	  	addelement();
+		
+		break;
+          }
+	  if( parseInt(date1.split("-")[0]) < parseInt(today.getFullYear()) )
+  	  {
+		adderror();
+		break;
+ 	  }
+  	  else if (parseInt( date1.split("-")[0] ) == parseInt(today.getFullYear()))
+  	  {
+
+		if((date1.split("-")[1])<(today.getMonth()+1))
+		{
+			adderror();
+			break;
+
+		}
+		else if((date1.split("-")[1])==(today.getMonth()+1))
+		{
+			if( (date1.split("-")[2]) < (today.getDate()) )	
+			{
+				adderror();
+				break;			
+			}
+			
+		}
+
+  	   }  
+	sendRequest();
+	 break;
+        case google.maps.GeocoderStatus.ZERO_RESULTS:
+	addelement();
+//document.getElementById('valid').value = 'NO';
+          break;
+        default:
+          alert("An error occured while validating this address");
+      }
+    });
+	
+  }
+ 
+  function clearResults() {
+    
+    var list = document.getElementById("jserror");
+        while (list.firstChild) {
+                list.removeChild(list.firstChild);
+                }
+//document.getElementById('valid').value = '';
+//document.getElementById('type').value = '';
+//document.getElementById('result').value = '';
+   
+//map.setZoom(12);
+//marker.setMap(null);
+  }
+    function mapAddress(result) {
+    marker.setPosition(result.geometry.location);
+    marker.setMap(map);
+    map.fitBounds(result.geometry.viewport);
+  }
+  function adderror() {
+  
+	var ullist = document.getElementById("jserror");
+	ullist.innerHTML="<li style= \"color:red; font-size:20px\">Enter a valid task deadline</li>";
+   
+   }
+  function addelement() {
+  
+	var ullist = document.getElementById("jserror");
+	ullist.innerHTML="<li style= \"color:red; font-size:20px\">WE COULD NOT FIND YOU. ENTER A VALID ADDRESS</li>";
+   
+   }
+
+function sendRequest() {
+
+	var door = document.getElementById('door').value;
+	var street = document.getElementById('street').value;
+	var city = document.getElementById('city').value;
+	var state = document.getElementById('state').value;
+	var pin = document.getElementById('pin').value;
+	var name = document.getElementById('name').value;
+	var value = document.getElementById('value').value;
+	var description = document.getElementById('description').value;
+	var sel = document.getElementById('tasktype');
+	var tasktype=sel.options[sel.selectedIndex].value;
+	var deadline = document.getElementById('deadline').value;
+
+
+    if (window.XMLHttpRequest) {
+        req = new XMLHttpRequest();
+    } else {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+	req.onreadystatechange = handleResponse;
+	req.open("POST","/entrust-app/post-task/",true);
+	req.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	req.send("door="+door+"&street="+street+"&city="+city+"&state="+state+"&pin="+pin+"&name="+name+"&value="+value+"&description="+description+"&tasktype="+tasktype+"&deadline="+deadline);
+
+}
+
+function handleResponse() {
+    if (req.readyState != 4 || req.status != 200) {
+        return;
+    }
+
+	var list = document.getElementById("prevtasks");
+        while (list.firstChild) {
+                list.removeChild(list.firstChild);
+                }
+	var xmlData = req.responseXML;
+        var items = xmlData.getElementsByTagName("tasks");
+	list.innerHTML="<h3>Your previous tasks</h3>";
+	for (var i = 0; i < items.length; ++i) {
+        var taskname = items[i].getElementsByTagName("taskname")[0].textContent
+        var taskdetails = items[i].getElementsByTagName("taskdetails")[0].textContent
+        var uname = items[i].getElementsByTagName("uname")[0].textContent
+
+	var taskbody = document.createElement("div");
+   	taskbody.setAttribute('class',"media");
+	taskbody.innerHTML="<a href=\"#\" class=\"pull-left\"> <img class=\"media-object\" src=\"/entrust-app/photo/"+uname+"\" width=\"90px\" height=\"90px\"/></a>";
+	taskbody_inner = document.createElement("div");
+	taskbody_inner.setAttribute('class',"media-body");
+	taskbody_inner.innerHTML="<h4 class=\"media-heading\">"+taskname+"</h4>"+taskdetails;
+	
+	 taskbody.appendChild(taskbody_inner);
+	 list.appendChild(taskbody);
+	
+	}
+}
+</script>
+
+    <link href="/static/css/footer.css" rel="stylesheet">
+    <div id="footer" class="row_bottom span12">
+      <div class="container-fluid">
+        <p class="text-muted credit pull-center" style="padding-top:25px">Courtesy <a href="#">Sumaithri Mukkamalla & Arvind Balaji</a> as a part of Web Application Development <a href="http://www.cs.cmu.edu/~charlie/courses/webapps/2012-fall/"> (15-637) </a> course at <a href="http://www.cmu.edu"> CMU </a><a href="/entrust-app/resources">|| Resources ||</a></p>
+      </div>
+    </div>
+
+	<script type="text/javascript" src="/static/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/static/js/scripts.js"></script>
+    <script type="text/javascript" src="/static/js/jquery.js"></script>  
+    <script type="text/javascript" src="/static/js/bootstrap-dropdown.js"></script>  
+
+	<script type="text/javascript">  
+	$(document).ready(function () {  
+	    $('.dropdown-toggle').dropdown();  
+	});  
+	</script>
+
+<!-- ADDRESS VALIDATION AND REQUEST SENDING ENDS HERE -->
+<script>
+function codeAddress() {
+    
+   // var geocoder = new google.maps.Geocoder();
+    var address = document.getElementById("address").value;
+    geocoder.geocode( { 'address': address}, function(results, status) 
+    {
+      if (status == google.maps.GeocoderStatus.OK) 
+      {
+        map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+
+      } 
+ else {
+              alert("Geocode was not successful for the following reason: " + status);
+      }
+    });
+}
+</script>
+<script type="text/javascript"> 
+codeAddress();
+</script>
+</body>
+</html>

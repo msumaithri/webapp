@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title> Entrust - Home Page </title>
+		<meta charset="utf-8">
+		<meta name="author" content="Z-Warriors">
+		<link rel="shortcut icon" href="/static/ico/favicon.ico">
+	    <link href="/static/css/bootstrap.css" rel="stylesheet">
+	    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+	    <link href="/static/css/bootstrap-responsive.min.css" rel="stylesheet">
+	    <link href="/static/css/style.css" rel="stylesheet">
+		<link href="http://fonts.googleapis.com/css?family=Syncopate" rel="stylesheet" type="text/css">
+
+	</head>
+<body>
+<div class="container-fluid">
+	<div class="span4">
+	</div>
+	<a href="/entrust-app/" > <img alt="170x170" align="center" class="span4" src="/static/img/logo.png"/> </a>
+	<div class="span4">
+	</div>
+
+
+	<div class="span12">
+	</div>
+	<div class="span4">
+	</div>
+	<div class="span4">
+	<h4> {{ message }}</h4>
+		<form name="register" action='/entrust-app/login' method='POST'>
+
+	{% csrf_token %}  
+		<fieldset>  
+				  
+			<input type ="text" name="username" id="username" placeholder="Nickname" style="width:400px;height:50px;">
+				<br>
+				<br>
+				<input type ="password" name="password" id="password" placeholder="Password" style="height:50px;width:400px;">
+				<div class="control-group" style="margin-top:5px;margin-left:55px"> 
+		            <input type="submit" value="Login" class="btn btn-inverse" style=" height:50px;width:150px;margin-left:70px;margin-top:5px"></input>  
+		        </div>  
+		</fieldset>  
+		</form>
+		<p>Forgot your password ? Click <a href='/entrust-app/resetpassword/' style="color:black"><B>here</B></a> to reset it</p>
+		<h4 style="margin-left:30px">{{registration_message}}</h4>
+	</div>
+
+	<div class="span4">
+	</div>
+
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+<prevtasks>{% for values in prevtasks %}
+  <tasks>
+    <taskname>{{ values.task_name}}</taskname>
+    <taskdetails>{{values.task_details}}</taskdetails>
+    <uname>{{values.user_ordering.username}}</uname>
+  </tasks>{% endfor %}
+</prevtasks>
